@@ -1,0 +1,94 @@
+:root{
+    --primary-color: darkviolet;
+    --secondary-color: magenta;
+    --tertiary-color: blue;
+    --primary-font-color: rgb(0, 255, 0);
+    --secondary-font-color: red;
+}
+
+body{
+    background-image: url("../images/tubaros_fundo.png");
+    font-family: 'Helvetica';
+}
+
+#main{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    max-width: 1280px;
+    width: 90%;
+    min-height: 90vh;
+}
+
+#div-titulo{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 600px) {
+    #div-titulo{
+        flex-direction: column;
+    }
+}
+
+#bobo{
+    display: flex;
+    color: white;
+    min-height: 1000vh;
+}
+
+#back-bobo{
+    align-self: center;
+    background-color: var(--secondary-color);
+    border-radius: 50%;
+    padding: 5px;
+    color: var(--primary-font-color);
+}
+
+#tubarao{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary-font-color);
+}
+
+
+/* https://stackoverflow.com/questions/54702124/rainbow-text-animation-using-only-css */
+/* texto em arco iris */
+.rainbow {
+    text-align: center;
+    font-size: 32px;
+    letter-spacing: 10px;
+}
+
+.rainbow_text_animated::selection{
+    background: linear-gradient(to right, #6666ff, #0099ff , #00ff00, #ff3399, #6666ff, #0099ff, #00ff00);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: rainbow_animation 1s linear infinite;
+    background-size: 400% 100%;
+}
+
+.rainbow_text_animated {
+    background: linear-gradient(to right, #6666ff, #0099ff , #00ff00, #ff3399, #6666ff, #0099ff, #00ff00);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: rainbow_animation 1s linear infinite;
+    background-size: 400% 100%;
+}
+
+@keyframes rainbow_animation {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: 85% 0;
+    }
+}
+/* texto em arco iris */
