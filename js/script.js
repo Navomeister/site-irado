@@ -16,6 +16,8 @@ melancia.onload = renderImages;
 
 let imgCount = 1;
 
+let mousePos = null;
+
 function renderImages() {
     if (--imgCount > 0) {
         return
@@ -49,3 +51,12 @@ function animate() {
     drawBorder();
     suika.draw();
 }
+
+// ao mover mouse dentro do canvas
+canvas.addEventListener("mousemove", e => {
+    // tira o offset porque pega em relação à página inteira
+    mousePos = {
+        x: e.clientX - canvas.offsetLeft,
+        y: e.clientY - canvas.offsetTop
+    }
+})
