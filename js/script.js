@@ -6,55 +6,46 @@ const rootStyles = getComputedStyle(root);
 
 
 // https://www.youtube.com/watch?v=Zdicf60eNzA
-let suikaImg = new Image();
-suikaImg.src = ("https://www.onlygfx.com/wp-content/uploads/2021/01/watercolor-watermelon-2.png");
-suikaImg.onload = renderizar;
-
-let qtImg = 1;
-
 const canvas = document.getElementById("divertido");
-const contexto = canvas.getContext("2d");
+const ctx = canvas.getContext("2d");
 
-// funçoes
-function renderizar() {
-    if (--qtImg > 0) {
-        return;
+let melancia = new Image();
+melancia.src = "https://www.onlygfx.com/wp-content/uploads/2021/01/watercolor-watermelon-1.png";
+melancia.width = 50;
+melancia.onload = renderImages;
+
+let imgCount = 1;
+
+function renderImages() {
+    if (--imgCount > 0) {
+        return
     }
-    animar();
+    animate();
+}
+
+function drawBorder(){
+    ctx.fillStyle = "#666666";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(20, 20, 560, 560);
 }
 
 class Suika {
     constructor(x,y) {
-        this.x = x;
-        this.y = y;
+        this.x=x;
+        this.y=y;
+        this.topX = x-35;
+        this.topY = y-140;
     }
-
-    stand() {
-        contexto.beginPath();
-        contexto.moveTo(this.x, this.y);
-        contexto.lineTo(this.x+15, this.y-50);
-        contexto.lineTo(this.x+30, this.y);
-        contexto.stroke();
-    }
-    
     draw() {
-        this.stand();
-        // contexto.drawImage(suikaImg, this.x, this.y, 100, 50);
+        ctx.drawImage(melancia, this.topX, this.topY, 100, 100)
     }
 }
 
-let suika = new Suika(40, 200)
+let suika = new Suika(80,580);
 
-function desenhaBorda() {
-    contexto.fillStyle = rootStyles.getPropertyValue("--primary-color");
-    contexto.fillRect(0, 0, canvas.width, canvas.height);
-    contexto.clearRect(10, 0, 280, 145);
-}
-
-function animar() {
-    requestAnimationFrame(animar);
-    contexto.clearRect(0,0,canvas.width,canvas.height);
-    // desenha a borda
-    desenhaBorda();
+function animate() {
+    requestAnimationFrame(animate);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    drawBorder();
     suika.draw();
 }
