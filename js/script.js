@@ -14,12 +14,16 @@ melancia.src = "https://www.onlygfx.com/wp-content/uploads/2021/01/watercolor-wa
 melancia.width = 50;
 melancia.onload = renderImages;
 
-let imgCount = 1;
+let melancias = []
 
-let mousePos = null;
+let imgCont = 1;
+
+let clickCont = 0;
+
+let mouseX = [null];
 
 function renderImages() {
-    if (--imgCount > 0) {
+    if (--imgCont > 0) {
         return
     }
     animate();
@@ -28,7 +32,32 @@ function renderImages() {
 function drawBorder(){
     ctx.fillStyle = "#666666";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.clearRect(20, 20, 560, 560);
+    ctx.clearRect(40, 0, 520, 580);
+    ctx.clearRect(0, 0, 600, 150);
+    ctx.clearRect(0, 0, 20, 600);
+    ctx.clearRect(580, 0, 20, 600);
+}
+
+class Melancia {
+    constructor(x, y) {
+        this.radius = 100;
+        this.mass = this.radius;
+        this.x = x;
+        this.y = y;
+        this.sprite = melancia;
+        // this.dx = Math.cos(180) * 7;
+        this.dy = Math.sin(-100) * 15;
+    }
+
+    move(){
+        if (this.y <= 485) {
+            this.y += this.dy;
+        }
+    }
+
+    draw() {
+        ctx.drawImage(this.sprite, this.x, this.y, 100, 100)
+    }
 }
 
 class Suika {
@@ -38,25 +67,41 @@ class Suika {
         this.topX = x-35;
         this.topY = y-140;
     }
-    draw() {
-        ctx.drawImage(melancia, this.topX, this.topY, 100, 100)
-    }
+    // draw() {
+    //     if (mouseX != null && mouseX <= 558 && mouseX >= 42) {
+    //         ctx.drawImage(melancia, mouseX - 50, 0, 100, 100);
+    //     }
+    // }
 }
 
 let suika = new Suika(80,580);
 
-function animate() {
+function animate(x = null) {
     requestAnimationFrame(animate);
     ctx.clearRect(0,0,canvas.width,canvas.height);
     drawBorder();
-    suika.draw();
+    melancias.forEach(melao => {
+        melao.move();
+
+        melao.draw();
+
+        // console.log(melao);
+    });
 }
 
-// ao mover mouse dentro do canvas
-canvas.addEventListener("mousemove", e => {
-    // tira o offset porque pega em relação à página inteira
-    mousePos = {
-        x: e.clientX - canvas.offsetLeft,
-        y: e.clientY - canvas.offsetTop
+
+canvas.addEventListener("click", e => {
+    mouseX = e.clientX - canvas.offsetLeft;
+    clickCont++;
+    if (mouseX > 517) {
+        mouseX = 517
     }
+    else if (mouseX < 82) {
+        mouseX = 82
+    }
+    melancias.push(
+        new Melancia(mouseX - 50, 1)
+    );
+    // console.log(suikas);
+    
 })
