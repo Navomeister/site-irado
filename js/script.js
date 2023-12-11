@@ -45,14 +45,17 @@ class Melancia {
         this.x = x;
         this.y = y;
         this.sprite = melancia;
-        // this.dx = Math.cos(180) * 7;
+        this.dx = Math.cos(180) * 7;
         this.dy = Math.sin(-100) * 15;
+        this.gravity = 0.05;
     }
 
     move(){
-        if (this.y <= 485) {
-            this.y += this.dy;
+        if (this.y + this.gravity < 580) {
+            this.dy +=  this.gravity;
         }
+        this.y += this.dy;
+        this.x += this.dx;
     }
 
     draw() {
@@ -85,23 +88,36 @@ function animate(x = null) {
 
         melao.draw();
 
+        bateuParede(melao);
         // console.log(melao);
     });
 }
 
+function bateuParede(melancia) {
+    if (melancia.y >= 485 ||
+        melancia.x < 30 || 
+        melancia.x > 465) {
+        if (melancia.y >= 485){
+            melancia.y = 485;
+            melancia.dy = 0;
+        }
+        if (melancia.x > 465) {
+            melancia.x = 465;
+            melancia.dx *= -1;
+        }
+        if (melancia.x < 30) {
+            melancia.x = 30;
+            melancia.dx *= -1;
+        }
+    }
+}
 
 canvas.addEventListener("click", e => {
     mouseX = e.clientX - canvas.offsetLeft;
     clickCont++;
-    if (mouseX > 517) {
-        mouseX = 517
-    }
-    else if (mouseX < 82) {
-        mouseX = 82
-    }
     melancias.push(
         new Melancia(mouseX - 50, 1)
     );
-    // console.log(suikas);
+    console.log(e.clientY - canvas.offsetTop);
     
 })
