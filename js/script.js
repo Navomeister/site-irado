@@ -4,13 +4,12 @@ const rootStyles = getComputedStyle(root);
 // console.log(rootStyles.getPropertyValue("--primary-color"));
 // ***
 
-
 // https://www.youtube.com/watch?v=Zdicf60eNzA
 const canvas = document.getElementById("divertido");
 const ctx = canvas.getContext("2d");
 
 let melancia = new Image();
-melancia.src = "https://www.onlygfx.com/wp-content/uploads/2021/01/watercolor-watermelon-1.png";
+melancia.src = "images/sprites/melancia.png";
 melancia.onload = renderImages;
 
 let melao = new Image();
@@ -59,20 +58,34 @@ class Melancia {
                 break;
         }
         // this.sprite = melancia;
+        this.dx = 0;
         // if (Math.random() < 0.5) {
         //     this.dx = Math.cos(180) * 7;
         // }
         // else {
         //     this.dx = Math.cos(180) * -7;
         // }
-        this.dx = 0;
+        
         this.dy = Math.sin(-100) * 15;
         this.gravity = 0.05;
         this.friction = 0.015;
     }
 
-    move(){
-        if (this.y + this.gravity < 580) {
+    move(index){
+      let cai = true;
+      for (let i = 0; i < melancias.length; i++) {
+         if (i != index) {
+            let melaoTeste = melancias[i];
+            let distanceX = Math.abs((melaoTeste.x + melaoTeste.radius) - this.x);
+            if (melaoTeste.y <= this.y + this.radius * 2 && distanceX <= this.radius * 2) {
+               if (this.dx <= 0.05) {
+                  cai = false;
+                  break;
+               }
+            }
+         }
+      }
+        if (this.y + this.gravity < 580 && cai) {
             this.dy +=  this.gravity;
         }
         if (this.dy < 0) {
@@ -105,37 +118,35 @@ class Suika {
     // }
 }
 
-let suika = new Suika(80,580);
-
-function animate(x = null) {
+function animate() {
     requestAnimationFrame(animate);
     ctx.clearRect(0,0,canvas.width,canvas.height);
     drawBorder();
     melancias.forEach((melao, index) => {
+        melao.move(index);
+        
         bateuParede(melao);
         
         collide(index);
-
-        melao.move();
         
         melao.draw();
     });
 }
 
 function bateuParede(melancia) {
-    if (melancia.y + melancia.radius * 2 >= 590 ||
-        melancia.x < 35 || 
-        melancia.x + melancia.radius * 2 > 570) {
-        if (melancia.y + melancia.radius * 2 >= 590){
-            melancia.y = 590 - melancia.radius;
+    if (melancia.y + melancia.radius * 2 >= 580 ||
+        melancia.x < 40 || 
+        melancia.x + melancia.radius * 2 > 560) {
+        if (melancia.y + melancia.radius * 2 >= 580){
+            melancia.y = 580 - melancia.radius * 2;
             melancia.dy = 0;
         }
-        if (melancia.x + melancia.radius * 2 > 565) {
-            melancia.x = 565 - melancia.radius * 2;
+        if (melancia.x + melancia.radius * 2 > 560) {
+            melancia.x = 560 - melancia.radius * 2;
             melancia.dx *= -1;
         }
-        if (melancia.x < 35) {
-            melancia.x = 35;
+        if (melancia.x < 40) {
+            melancia.x = 40;
             melancia.dx *= -1;
         }
     }
@@ -158,45 +169,65 @@ function colideMelancias(melao1,melao2){
     let dx = melao2.x - melao1.x;
     let dy = melao2.y - melao1.y;
     let distance = Math.sqrt(dx * dx + dy * dy);
-    // Work out the normalized collision vector (direction only)
-    // nao entendi o que isso faz :/
+    //Work out the normalized collision vector (direction only)
     let vCollisionNorm = {x: dx / distance, y:dy/distance}
-    // Velocidade relativa do segundo melao
+    //Relative velocity of ball 2
     let vRelativeVelocity = {x: melao1.dx - melao2.dx,y:melao1.dy - melao2.dy};
-    // Calcula o produto
+    //Calculate the dot product
     let speed = vRelativeVelocity.x * vCollisionNorm.x + vRelativeVelocity.y * vCollisionNorm.y;
-    // Não faz nada porque as melancias ja estao se distanciando
+    //Don't do anything because balls are already moving out of each others way
     if(speed < 0) {
         return;
     }
     let impulse = 2 * speed / (melao1.mass + melao2.mass);
-    // A partir da velocidade relativa do melao2, pega a velocidade p/ o melao1, já que é uma colisão
+    //Becuase we calculated the relative velocity of melao2. melao1 needs to go in the opposite direction, hence a collision.
     melao1.dx -= (impulse * melao2.mass * vCollisionNorm.x);
     melao1.dy -= (impulse * melao2.mass * vCollisionNorm.y);
     melao2.dx += (impulse * melao1.mass * vCollisionNorm.x);
     melao2.dy += (impulse * melao1.mass * vCollisionNorm.y);
+   //  if (distance < (melao1.radius * 2 + melao2.radius * 2)) {
+   //      let dxT = melao2.x - melao1.x;
+   //      let dyT = melao2.y - melao1.y;
+   //      if (melao2.x < 40 || 
+   //          melao2.x + melao2.radius * 2 > 560) {
+   //          melao1.x -= dxT;
+   //      }
+   //      else {
+   //          melao1.x -= dxT / 2;
+   //          melao2.x += dxT / 2;
+   //      }
+   //      if (melao2.y + melao2.radius * 2 >= 580) {
+            
+   //          melao1.y -= dyT / 2;
+   //      }
+   //      else {
+   //          melao1.y -= dyT / 2;
+   //          melao2.y += dyT / 2;
+   //      }
+   //      console.log(distance);
+   //  }
 }
+
 
 function collide(index) {
     let melao = melancias[index];
     for(let j = 0; j < melancias.length; j++){
         if (j != index) {
-            let melaoTeste = melancias[j];
-            if(bateuMelancia(melao,melaoTeste)){
-                // testeColisao(melao, melaoTeste);
-                colideMelancias(melao,melaoTeste);   
-                if (melao.nome == melaoTeste.nome) {
-                    fusao(index, j);
-                }
-            }
+         let melaoTeste = melancias[j];
+         if(bateuMelancia(melao,melaoTeste)){
+            colideMelancias(melao,melaoTeste);   
+            // if (melao.nome == melaoTeste.nome) {
+            //     fusao(index, j);
+            // }
+         }
         }
     }
 }
 
 function fusao(index1, index2) {
     raio = melancias[index1].radius;
-    x = melancias[index1].x;
-    y = melancias[index1].y;
+    x = melancias[index2].x;
+    y = melancias[index2].y;
     melancias.splice(index2, 1);
     melancias.splice(index1, 1);
     melancias.push(
@@ -209,7 +240,7 @@ canvas.addEventListener("click", e => {
     let mouseY = e.clientY - canvas.offsetTop;
     clickCont++;
     melancias.push(
-        new Melancia(mouseX - 50, mouseY, 50)
+        new Melancia(mouseX - 50, 0, 50)
     );
     
 })
