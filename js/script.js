@@ -73,18 +73,18 @@ class Melancia {
 
     move(index){
       let cai = true;
-      for (let i = 0; i < melancias.length; i++) {
-         if (i != index) {
-            let melaoTeste = melancias[i];
-            let distanceX = Math.abs((melaoTeste.x + melaoTeste.radius) - this.x);
-            if (melaoTeste.y <= this.y + this.radius * 2 && distanceX <= this.radius * 2) {
-               if (this.dx <= 0.05) {
-                  cai = false;
-                  break;
-               }
-            }
-         }
-      }
+    //   for (let i = 0; i < melancias.length; i++) {
+    //      if (i != index) {
+    //         let melaoTeste = melancias[i];
+    //         let distanceX = Math.abs((melaoTeste.x + melaoTeste.radius) - this.x);
+    //         if (melaoTeste.y <= this.y + this.radius * 2 && (distanceX <= this.radius * 1.75 && distanceX <= this.radius * 1.25)) {
+    //            if (this.dx <= 0.05) {
+    //               cai = false;
+    //               break;
+    //            }
+    //         }
+    //      }
+    //   }
         if (this.y + this.gravity < 580 && cai) {
             this.dy +=  this.gravity;
         }
@@ -185,27 +185,50 @@ function colideMelancias(melao1,melao2){
     melao1.dy -= (impulse * melao2.mass * vCollisionNorm.y);
     melao2.dx += (impulse * melao1.mass * vCollisionNorm.x);
     melao2.dy += (impulse * melao1.mass * vCollisionNorm.y);
-   //  if (distance < (melao1.radius * 2 + melao2.radius * 2)) {
-   //      let dxT = melao2.x - melao1.x;
-   //      let dyT = melao2.y - melao1.y;
-   //      if (melao2.x < 40 || 
-   //          melao2.x + melao2.radius * 2 > 560) {
-   //          melao1.x -= dxT;
-   //      }
-   //      else {
-   //          melao1.x -= dxT / 2;
-   //          melao2.x += dxT / 2;
-   //      }
-   //      if (melao2.y + melao2.radius * 2 >= 580) {
-            
-   //          melao1.y -= dyT / 2;
-   //      }
-   //      else {
-   //          melao1.y -= dyT / 2;
-   //          melao2.y += dyT / 2;
-   //      }
-   //      console.log(distance);
-   //  }
+    // console.log(melao1.dx);
+    // O que preciso fazer: pegar as coordenadas x e y - raio (p/ pegar centro) e calcular qual a distância entre as melancias
+    // e mover cada uma metade da distância cada uma, a não ser que uma delas já esteja na parede
+    // MAS só fazer isso quando precisa (quando stivr suportado por uma ou mais melancias, fazendo não ter espaço p/ baixar)
+    // OOOOOOOUUU
+    // conseguir fazer essa merda parar de afundar quando tá parada
+    // let dyT = (melao2.y + melao2.radius) - (melao1.y + melao1.radius);
+    // let dxT = (melao2.x + melao2.radius) - (melao1.x + melao2.radius);
+
+    // if (dyT < (melao1.radius + melao2.radius) && melao1.y < melao2.y && Math.floor(melao1.dy) == 0) {
+        // if (melao2.y + melao2.radius * 2 >= 580) {
+        //     melao1.y = melao2.y - melao1.radius * 2;
+        // }
+        // else if (melao1.y + melao1.radius * 2 >= 580) {
+        //     melao2.y = melao1.y - melao2.radius * 2;
+        // }
+        // else {
+        //     melao1.y -= dyT / 2;
+        //     melao2.y += dyT / 2;
+        // }
+        // console.log(distance);
+    // }
+    // if (dxT < (melao1.radius + melao2.radius)) {
+    //     if (melao2.x - dxT / 2 < 40 || 
+    //         melao2.x + melao2.radius * 2 + dxT / 2 > 560) {
+    //             if (melao2.x < 40) {
+    //                 melao1.x += dxT / 2;
+    //             } else {
+    //                 melao1.x -= dxT / 2;
+    //             }
+    //     }
+    //     else if (melao1.x - dxT / 2 < 40 || 
+    //         melao1.x + melao1.radius * 2 + dxT / 2 > 560) {
+    //             if (melao1.x < 40) {
+    //                 melao2.x += dxT / 2;
+    //             } else {
+    //                 melao2.x -= dxT / 2;
+    //             }
+    //     }
+    //     else {
+    //         melao1.x -= dxT / 2;
+    //         melao2.x += dxT / 2;
+    //     }
+    // }
 }
 
 
@@ -228,8 +251,8 @@ function fusao(index1, index2) {
     raio = melancias[index1].radius;
     x = melancias[index2].x;
     y = melancias[index2].y;
-    melancias.splice(index2, 1);
     melancias.splice(index1, 1);
+    melancias.splice(index2, 1);
     melancias.push(
         new Melancia(x, y, 75)
     );
@@ -239,6 +262,7 @@ canvas.addEventListener("click", e => {
     mouseX = e.clientX - canvas.offsetLeft;
     let mouseY = e.clientY - canvas.offsetTop;
     clickCont++;
+    // console.log(mouseY)
     melancias.push(
         new Melancia(mouseX - 50, 0, 50)
     );
