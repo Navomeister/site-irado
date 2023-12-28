@@ -47,49 +47,34 @@ class Melancia {
         this.x = x;
         this.y = y;
         switch (raio) {
+            case 50:
+                this.nome = "melao";
+                this.sprite = melancia;
+                this.proxRad = 75;
+                break;
+
             case 75:
                 this.nome = "melao";
-                this.sprite = melao;
+                this.sprite = melancia;
+                this.proxRad = 100;
                 break;
         
             default:
                 this.nome = "melancia";
                 this.sprite = melancia;
+                this.proxRad = 50;
                 break;
         }
-        // this.sprite = melancia;
         this.dx = 0;
-        // if (Math.random() < 0.5) {
-        //     this.dx = Math.cos(180) * 7;
-        // }
-        // else {
-        //     this.dx = Math.cos(180) * -7;
-        // }
         
         this.dy = Math.sin(-100) * 15;
         this.gravity = 0.05;
         this.friction = 0.015;
     }
 
-    move(index){
-      let cai = true;
-    //   for (let i = 0; i < melancias.length; i++) {
-    //      if (i != index) {
-    //         let melaoTeste = melancias[i];
-    //         let distanceX = Math.abs((melaoTeste.x + melaoTeste.radius) - this.x);
-    //         if (melaoTeste.y <= this.y + this.radius * 2 && (distanceX <= this.radius * 1.75 && distanceX <= this.radius * 1.25)) {
-    //            if (this.dx <= 0.05) {
-    //               cai = false;
-    //               break;
-    //            }
-    //         }
-    //      }
-    //   }
-        if (this.y + this.gravity < 580 && cai) {
+    move(){
+        if (this.y + this.gravity < 580) {
             this.dy +=  this.gravity;
-        }
-        if (this.dy < 0) {
-            this.dy *= -1;
         }
         this.dy = this.dy - (this.dy * this.friction);
         this.dx = this.dx - (this.dx * this.friction);
@@ -118,12 +103,13 @@ class Suika {
     // }
 }
 
+// função de animação do canvas :D
 function animate() {
     requestAnimationFrame(animate);
     ctx.clearRect(0,0,canvas.width,canvas.height);
     drawBorder();
     melancias.forEach((melao, index) => {
-        melao.move(index);
+        melao.move();
         
         bateuParede(melao);
         
@@ -133,16 +119,17 @@ function animate() {
     });
 }
 
+// checa se bateu na parede tendo em conta o tamanho do canvas, o offset até a parede (apnas no x) e a espessura da parede
 function bateuParede(melancia) {
-    if (melancia.y + melancia.radius * 2 >= 580 ||
+    if (melancia.y + melancia.radius * 2 >= canvas.height - 20 ||
         melancia.x < 40 || 
-        melancia.x + melancia.radius * 2 > 560) {
-        if (melancia.y + melancia.radius * 2 >= 580){
-            melancia.y = 580 - melancia.radius * 2;
+        melancia.x + melancia.radius * 2 > canvas.width - 40) {
+        if (melancia.y + melancia.radius * 2 >= canvas.height - 20){
+            melancia.y = canvas.height - 20 - melancia.radius * 2;
             melancia.dy = 0;
         }
-        if (melancia.x + melancia.radius * 2 > 560) {
-            melancia.x = 560 - melancia.radius * 2;
+        if (melancia.x + melancia.radius * 2 > canvas.width - 40) {
+            melancia.x = canvas.width - 40 - melancia.radius * 2;
             melancia.dx *= -1;
         }
         if (melancia.x < 40) {
@@ -153,9 +140,11 @@ function bateuParede(melancia) {
 }
 
 function bateuMelancia(melao1, melao2) {
+    // agora preciso arrumar aqui, do jeito que tava a colisão entre mesmo raio funciona, mas colisão entre diferentes raios está deslocada
+    // dar um jeito de o cálculo servir pra isso, não sei como ainda
     let collision = false;
-    let dx = melao1.x - melao2.x;
-    let dy = melao1.y - melao2.y;
+    let dx = (melao1.x + melao1.radius * 2) - (melao2.x + melao2.radius * 2);
+    let dy = (melao1.y + melao1.radius * 2) - (melao2.y + melao2.radius * 2);
     //Modified pythagorous, because sqrt is slow
     let distance = (dx * dx + dy * dy);
     if(distance <= (melao1.radius + melao2.radius)*(melao1.radius + melao2.radius)){
@@ -185,50 +174,12 @@ function colideMelancias(melao1,melao2){
     melao1.dy -= (impulse * melao2.mass * vCollisionNorm.y);
     melao2.dx += (impulse * melao1.mass * vCollisionNorm.x);
     melao2.dy += (impulse * melao1.mass * vCollisionNorm.y);
-    // console.log(melao1.dx);
     // O que preciso fazer: pegar as coordenadas x e y - raio (p/ pegar centro) e calcular qual a distância entre as melancias
     // e mover cada uma metade da distância cada uma, a não ser que uma delas já esteja na parede
     // MAS só fazer isso quando precisa (quando stivr suportado por uma ou mais melancias, fazendo não ter espaço p/ baixar)
     // OOOOOOOUUU
     // conseguir fazer essa merda parar de afundar quando tá parada
-    // let dyT = (melao2.y + melao2.radius) - (melao1.y + melao1.radius);
-    // let dxT = (melao2.x + melao2.radius) - (melao1.x + melao2.radius);
-
-    // if (dyT < (melao1.radius + melao2.radius) && melao1.y < melao2.y && Math.floor(melao1.dy) == 0) {
-        // if (melao2.y + melao2.radius * 2 >= 580) {
-        //     melao1.y = melao2.y - melao1.radius * 2;
-        // }
-        // else if (melao1.y + melao1.radius * 2 >= 580) {
-        //     melao2.y = melao1.y - melao2.radius * 2;
-        // }
-        // else {
-        //     melao1.y -= dyT / 2;
-        //     melao2.y += dyT / 2;
-        // }
-        // console.log(distance);
-    // }
-    // if (dxT < (melao1.radius + melao2.radius)) {
-    //     if (melao2.x - dxT / 2 < 40 || 
-    //         melao2.x + melao2.radius * 2 + dxT / 2 > 560) {
-    //             if (melao2.x < 40) {
-    //                 melao1.x += dxT / 2;
-    //             } else {
-    //                 melao1.x -= dxT / 2;
-    //             }
-    //     }
-    //     else if (melao1.x - dxT / 2 < 40 || 
-    //         melao1.x + melao1.radius * 2 + dxT / 2 > 560) {
-    //             if (melao1.x < 40) {
-    //                 melao2.x += dxT / 2;
-    //             } else {
-    //                 melao2.x -= dxT / 2;
-    //             }
-    //     }
-    //     else {
-    //         melao1.x -= dxT / 2;
-    //         melao2.x += dxT / 2;
-    //     }
-    // }
+    // conseegui :D
 }
 
 
@@ -236,25 +187,34 @@ function collide(index) {
     let melao = melancias[index];
     for(let j = 0; j < melancias.length; j++){
         if (j != index) {
-         let melaoTeste = melancias[j];
-         if(bateuMelancia(melao,melaoTeste)){
-            colideMelancias(melao,melaoTeste);   
-            // if (melao.nome == melaoTeste.nome) {
-            //     fusao(index, j);
-            // }
+            let melaoTeste = melancias[j];
+            if(bateuMelancia(melao,melaoTeste)){
+                // se possível tentar melhorar essa parte, ta causando uma tremulação a partir de 2 colisões
+                melao.dy -= melao.gravity;
+                console.log(melao.dy)
+                colideMelancias(melao,melaoTeste);   
+                // if (melao.nome == melaoTeste.nome) {
+                //     fusao(index, j);
+                // }
          }
         }
     }
 }
 
 function fusao(index1, index2) {
-    raio = melancias[index1].radius;
-    x = melancias[index2].x;
-    y = melancias[index2].y;
-    melancias.splice(index1, 1);
-    melancias.splice(index2, 1);
+    primIndex = index1;
+    segIndex = index2;
+    raio = melancias[primIndex].radius;
+    proxRaio = melancias[segIndex].proxRad;
+    x = melancias[segIndex].x;
+    y = melancias[segIndex].y;
+    melancias.splice(primIndex, 1);
+    if (primIndex < segIndex) {
+        segIndex--;
+    }
+    melancias.splice(segIndex, 1);
     melancias.push(
-        new Melancia(x, y, 75)
+        new Melancia(x, y, proxRaio)
     );
 }
 
@@ -264,7 +224,7 @@ canvas.addEventListener("click", e => {
     clickCont++;
     // console.log(mouseY)
     melancias.push(
-        new Melancia(mouseX - 50, 0, 50)
+        new Melancia(mouseX - 25, 0, 25)
     );
     
 })
