@@ -43,26 +43,26 @@ function drawBorder(){
 class Melancia {
     constructor(x, y, raio) {
         this.radius = raio;
-        this.mass = this.radius;
+        this.mass = 25;
         this.x = x;
         this.y = y;
         switch (raio) {
             case 50:
                 this.nome = "melao";
                 this.sprite = melancia;
-                this.proxRad = 75;
+                this.proxRaio = 75;
                 break;
 
             case 75:
-                this.nome = "melao";
+                this.nome = "morando";
                 this.sprite = melancia;
-                this.proxRad = 100;
+                this.proxRaio = 100;
                 break;
         
             default:
                 this.nome = "melancia";
                 this.sprite = melancia;
-                this.proxRad = 50;
+                this.proxRaio = 50;
                 break;
         }
         this.dx = 0;
@@ -143,8 +143,8 @@ function bateuMelancia(melao1, melao2) {
     // agora preciso arrumar aqui, do jeito que tava a colisão entre mesmo raio funciona, mas colisão entre diferentes raios está deslocada
     // dar um jeito de o cálculo servir pra isso, não sei como ainda
     let collision = false;
-    let dx = (melao1.x + melao1.radius * 2) - (melao2.x + melao2.radius * 2);
-    let dy = (melao1.y + melao1.radius * 2) - (melao2.y + melao2.radius * 2);
+    let dx = (melao1.x + melao1.radius) - (melao2.x + melao2.radius);
+    let dy = (melao1.y + melao1.radius) - (melao2.y + melao2.radius);
     //Modified pythagorous, because sqrt is slow
     let distance = (dx * dx + dy * dy);
     if(distance <= (melao1.radius + melao2.radius)*(melao1.radius + melao2.radius)){
@@ -174,30 +174,27 @@ function colideMelancias(melao1,melao2){
     melao1.dy -= (impulse * melao2.mass * vCollisionNorm.y);
     melao2.dx += (impulse * melao1.mass * vCollisionNorm.x);
     melao2.dy += (impulse * melao1.mass * vCollisionNorm.y);
-    // O que preciso fazer: pegar as coordenadas x e y - raio (p/ pegar centro) e calcular qual a distância entre as melancias
-    // e mover cada uma metade da distância cada uma, a não ser que uma delas já esteja na parede
-    // MAS só fazer isso quando precisa (quando stivr suportado por uma ou mais melancias, fazendo não ter espaço p/ baixar)
-    // OOOOOOOUUU
-    // conseguir fazer essa merda parar de afundar quando tá parada
-    // conseegui :D
 }
 
 
 function collide(index) {
     let melao = melancias[index];
+    let cai = true;
     for(let j = 0; j < melancias.length; j++){
         if (j != index) {
             let melaoTeste = melancias[j];
             if(bateuMelancia(melao,melaoTeste)){
-                // se possível tentar melhorar essa parte, ta causando uma tremulação a partir de 2 colisões
-                melao.dy -= melao.gravity;
-                console.log(melao.dy)
+                // ainda treme mas agora não sei o motivo :D
+                cai = false;
                 colideMelancias(melao,melaoTeste);   
-                // if (melao.nome == melaoTeste.nome) {
-                //     fusao(index, j);
-                // }
+                if (melao.nome == melaoTeste.nome) {
+                    fusao(index, j);
+                }
          }
         }
+    }
+    if (!cai) {
+        melao.dy -= melao.gravity;
     }
 }
 
@@ -205,7 +202,7 @@ function fusao(index1, index2) {
     primIndex = index1;
     segIndex = index2;
     raio = melancias[primIndex].radius;
-    proxRaio = melancias[segIndex].proxRad;
+    proxRaio = melancias[segIndex].proxRaio;
     x = melancias[segIndex].x;
     y = melancias[segIndex].y;
     melancias.splice(primIndex, 1);
@@ -220,11 +217,29 @@ function fusao(index1, index2) {
 
 canvas.addEventListener("click", e => {
     mouseX = e.clientX - canvas.offsetLeft;
-    let mouseY = e.clientY - canvas.offsetTop;
     clickCont++;
-    // console.log(mouseY)
     melancias.push(
         new Melancia(mouseX - 25, 0, 25)
     );
     
+})
+
+// para teste, coloca uma melancia maior no ultimo lugar clicado
+document.addEventListener("keypress", (event) => {
+    switch (event.key) {
+        case "q":
+            melancias.push(
+                new Melancia(mouseX - 50, 0, 50)
+            );
+            break;
+
+        case "w":
+            melancias.push(
+                new Melancia(mouseX - 75, 0, 75)
+            );
+            break;
+    
+        default:
+            break;
+    }
 })
