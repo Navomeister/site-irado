@@ -8,6 +8,21 @@ const rootStyles = getComputedStyle(root);
 const canvas = document.getElementById("divertido");
 const ctx = canvas.getContext("2d");
 
+// parte que mexe com a pontuação --------------------------
+var clique = false;
+
+var pontuacao = 0;
+const txtPontos = document.getElementById("pontos");
+
+function aumentaPonto(valor, multiplicador) {
+    let pontosFusao = valor * multiplicador
+    pontuacao += pontosFusao;
+    txtPontos.innerText = pontuacao.toString() + " pontos";
+}
+
+var multiplicador = 1;
+// ----------------------------------------------------------
+
 let melancia = new Image();
 melancia.src = "images/sprites/melancia.png";
 melancia.onload = renderImages;
@@ -51,18 +66,21 @@ class Melancia {
                 this.nome = "melao";
                 this.sprite = melancia;
                 this.proxRaio = 75;
+                this.valor = 250;
                 break;
 
             case 75:
                 this.nome = "morando";
                 this.sprite = melancia;
                 this.proxRaio = 100;
+                this.valor = 500;
                 break;
         
             default:
                 this.nome = "melancia";
                 this.sprite = melancia;
                 this.proxRaio = 50;
+                this.valor = 100;
                 break;
         }
         this.dx = 0;
@@ -155,8 +173,8 @@ function bateuMelancia(melao1, melao2) {
 
 function colideMelancias(melao1,melao2){
     // Pega a diferença exata entre os dois melao
-    let dx = melao2.x - melao1.x;
-    let dy = melao2.y - melao1.y;
+    let dx = (melao2.x + melao2.radius) - (melao1.x + melao1.radius);
+    let dy = (melao2.y + melao2.radius) - (melao1.y + melao2.radius);
     let distance = Math.sqrt(dx * dx + dy * dy);
     //Work out the normalized collision vector (direction only)
     let vCollisionNorm = {x: dx / distance, y:dy/distance}
@@ -188,10 +206,25 @@ function collide(index) {
                 cai = false;
                 colideMelancias(melao,melaoTeste);   
                 if (melao.nome == melaoTeste.nome) {
+                    clique = false;
+                    aumentaPonto(melao.valor, multiplicador);
+                    multiplicador++;
                     fusao(index, j);
+                }
+                else {
+                    if (clique) {
+                        clique = false;
+                        multiplicador = 1;
+                    }
                 }
          }
         }
+    }
+    if (multiplicador > 1) {
+        txtPontos.classList = "rainbow_text_animated";
+    }
+    else {
+        txtPontos.classList = "";
     }
     if (!cai) {
         melao.dy -= melao.gravity;
@@ -216,6 +249,7 @@ function fusao(index1, index2) {
 }
 
 canvas.addEventListener("click", e => {
+    clique = true;
     mouseX = e.clientX - canvas.offsetLeft;
     clickCont++;
     melancias.push(

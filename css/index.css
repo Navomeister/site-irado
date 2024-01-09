@@ -33,26 +33,17 @@ body{
     }
 }
 
-#bobo{
-    display: flex;
-    color: white;
-    min-height: 1000vh;
-}
-
-#back-bobo{
-    align-self: center;
-    background-color: var(--secondary-color);
-    border-radius: 50%;
-    padding: 5px;
-    color: var(--primary-font-color);
-}
-
 #tubarao{
+    margin-top: 20vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     color: var(--secondary-font-color);
+}
+
+#texto{
+    color: white;
 }
 
 
