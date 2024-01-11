@@ -9,9 +9,9 @@ const canvas = document.getElementById("divertido");
 const ctx = canvas.getContext("2d");
 
 // parte que mexe com a pontuação --------------------------
-var clique = false;
+let clique = false;
 
-var pontuacao = 0;
+let pontuacao = 0;
 const txtPontos = document.getElementById("pontos");
 
 function aumentaPonto(valor, multiplicador) {
@@ -20,24 +20,24 @@ function aumentaPonto(valor, multiplicador) {
     txtPontos.innerText = pontuacao.toString() + " pontos";
 }
 
-var multiplicador = 1;
+let multiplicador = 1;
 // ----------------------------------------------------------
 
+// parte relativa à mecânicas do jogo -----------------------
 let melancia = new Image();
 melancia.src = "images/sprites/melancia.png";
 melancia.onload = renderImages;
 
-let melao = new Image();
-melao.src = "https://png.pngtree.com/png-clipart/20210523/original/pngtree-whole-round-melon-png-image_6330243.png"
-melao.onload = renderImages;
-
 let melancias = []
 
-let imgCont = 2;
+let imgCont = 1;
 
-let clickCont = 0;
+let mouseX = null;
 
-let mouseX = [null];
+let podeClicar = true;
+
+let perdeu = false;
+// -----------------------------------------------------------
 
 function renderImages() {
     if (--imgCont > 0) {
@@ -63,21 +63,18 @@ class Melancia {
         this.y = y;
         switch (raio) {
             case 50:
-                this.nome = "melao";
                 this.sprite = melancia;
                 this.proxRaio = 75;
                 this.valor = 250;
                 break;
 
             case 75:
-                this.nome = "morando";
                 this.sprite = melancia;
                 this.proxRaio = 100;
                 this.valor = 500;
                 break;
         
             default:
-                this.nome = "melancia";
                 this.sprite = melancia;
                 this.proxRaio = 50;
                 this.valor = 100;
@@ -114,11 +111,6 @@ class Suika {
         this.topX = x-35;
         this.topY = y-140;
     }
-    // draw() {
-    //     if (mouseX != null && mouseX <= 558 && mouseX >= 42) {
-    //         ctx.drawImage(melancia, mouseX - 50, 0, 100, 100);
-    //     }
-    // }
 }
 
 // função de animação do canvas :D
@@ -134,6 +126,8 @@ function animate() {
         collide(index);
         
         melao.draw();
+
+        passouTopo(melao);
     });
 }
 
@@ -205,39 +199,43 @@ function collide(index) {
                 // ainda treme mas agora não sei o motivo :D
                 cai = false;
                 colideMelancias(melao,melaoTeste);   
-                if (melao.nome == melaoTeste.nome) {
+
+                // essa checagem tá meio quebrada pros pontos, já que entra nela quando tá em toda colisão
+                if (melao.radius == melaoTeste.radius) {
                     clique = false;
                     aumentaPonto(melao.valor, multiplicador);
                     multiplicador++;
+                    txtPontos.classList = "rainbow_text_animated";
                     fusao(index, j);
                 }
                 else {
-                    if (clique) {
+                    if (clique && melao == melancias.at(-1)) {
                         clique = false;
                         multiplicador = 1;
+                        txtPontos.classList = "";
                     }
                 }
          }
         }
     }
-    if (multiplicador > 1) {
-        txtPontos.classList = "rainbow_text_animated";
-    }
-    else {
-        txtPontos.classList = "";
-    }
+    // console.log(multiplicador);
     if (!cai) {
         melao.dy -= melao.gravity;
     }
 }
 
+// função p/ fundir duas melancias de tamanho igual
 function fusao(index1, index2) {
+    // armazena o index, já que ao excluir o primeiro pode haver mudança no número do segundo index
     primIndex = index1;
     segIndex = index2;
+
     raio = melancias[primIndex].radius;
     proxRaio = melancias[segIndex].proxRaio;
     x = melancias[segIndex].x;
     y = melancias[segIndex].y;
+    dx = melancias[primIndex].x - melancias[segIndex].x;
+    console.log(dx);
     melancias.splice(primIndex, 1);
     if (primIndex < segIndex) {
         segIndex--;
@@ -246,15 +244,31 @@ function fusao(index1, index2) {
     melancias.push(
         new Melancia(x, y, proxRaio)
     );
+    let novoMelao = melancias.at(-1);
+    Math.random() < 0.5 ? novoMelao.dx = -1 : novoMelao.dx = 1;
 }
 
+function passouTopo(melao) {
+    if (melao.y + melao.radius <= 150 && clique == false) {
+        perdeu = true;
+        console.log((melao.y + melao.radius) + " perdeu");
+    }
+}
+
+// evento de clique dentro do canvas
 canvas.addEventListener("click", e => {
-    clique = true;
-    mouseX = e.clientX - canvas.offsetLeft;
-    clickCont++;
-    melancias.push(
-        new Melancia(mouseX - 25, 0, 25)
-    );
+    console.log(e.clientY - canvas.offsetTop);
+    if (podeClicar) {
+        // podeClicar = false;
+        clique = true;
+
+        mouseX = e.clientX - canvas.offsetLeft;
+        melancias.push(
+            new Melancia(mouseX - 25, 0, 25)
+        );
+
+        // setTimeout(() => podeClicar = true, 3000);
+    }
     
 })
 
