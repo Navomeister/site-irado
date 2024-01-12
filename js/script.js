@@ -291,5 +291,6 @@ document.addEventListener("keypress", (event) => {
             default:
                 break;
         }
+        podeClicar = false;
     }
 })
