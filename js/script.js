@@ -259,7 +259,7 @@ function passouTopo(melao) {
 canvas.addEventListener("click", e => {
     console.log(e.clientY - canvas.offsetTop);
     if (podeClicar) {
-        // podeClicar = false;
+        podeClicar = false;
         clique = true;
 
         mouseX = e.clientX - canvas.offsetLeft;
@@ -267,27 +267,29 @@ canvas.addEventListener("click", e => {
             new Melancia(mouseX - 25, 0, 25)
         );
 
-        // setTimeout(() => podeClicar = true, 3000);
+        setTimeout(() => podeClicar = true, 3000);
     }
     
 })
 
 // para teste, coloca uma melancia maior no ultimo lugar clicado
 document.addEventListener("keypress", (event) => {
-    switch (event.key) {
-        case "q":
-            melancias.push(
-                new Melancia(mouseX - 50, 0, 50)
-            );
-            break;
+    if (podeClicar){
+        switch (event.key) {
+            case "q":
+                melancias.push(
+                    new Melancia(mouseX - 50, 0, 50)
+                );
+                break;
 
-        case "w":
-            melancias.push(
-                new Melancia(mouseX - 75, 0, 75)
-            );
-            break;
-    
-        default:
-            break;
+            case "w":
+                melancias.push(
+                    new Melancia(mouseX - 75, 0, 75)
+                );
+                break;
+        
+            default:
+                break;
+        }
     }
 })
