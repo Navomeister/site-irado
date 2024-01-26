@@ -227,6 +227,8 @@ function collide(index) {
 // função p/ fundir duas melancias de tamanho igual
 function fusao(index1, index2) {
     // armazena o index, já que ao excluir o primeiro pode haver mudança no número do segundo index
+    // eu não sei o que fazer pra não poder acabar uma dentro da outra após fusão
+    // colocar uma animaçãozinha (estrelas pulando talvez) pra quando fundir, só pra ter um charme
     primIndex = index1;
     segIndex = index2;
 
